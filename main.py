@@ -13,8 +13,8 @@ def getArgs(choiceMadeByUser):
     if len(sys.argv) == 2:
 
         if sys.argv[1] == "-h" or sys.argv[1] == "--help":  # Show the help menu
-            print("Show help")
-            exit()
+            displayHelp()
+
         elif sys.argv[1] == "--wizard" or sys.argv[1] == "-w":  # Run the wizard
             print("Wizard mode")
             userSelection(choiceMadeByUser)
@@ -40,6 +40,16 @@ def getArgs(choiceMadeByUser):
         sys.exit()
 
     installation(choiceMadeByUser)
+
+def displayHelp():
+
+    print("usage : python main.py [-h] [-w] [-d domain] [-l level of scan]\n")
+    print("optional arguments:")
+    print("-h, --help            show this help message and exit")
+    print("-w, --wizard          run the wizard")
+    print("-d, --domain          domain to scan")
+    print("-l, --level           level of scan (1, 2, or 3)")
+    exit(0)
 
 
 def installation(choiceMadeByUser):
