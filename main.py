@@ -39,7 +39,7 @@ def getArgs(choiceMadeByUser):
         print("No arguments passed, please use --wizard or -w to run the wizard or use --help or -h to see the help menu")
         sys.exit()
 
-    installation()
+    installation(choiceMadeByUser)
 
 
 def installation(choiceMadeByUser):
