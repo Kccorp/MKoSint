@@ -1,11 +1,10 @@
 import os
 import sys
 import time
-import pip
 
 
 def main():
-    choiceMadeByUser = ["", 0]
+    choiceMadeByUser = ["", 0, ""]
     getArgs(choiceMadeByUser)
 
 
@@ -30,10 +29,24 @@ def getArgs(choiceMadeByUser):
                 else:
                     print("Invalid level of scan (1, 2, or 3)")
                     exit()
+            elif sys.argv[i] == "-df" or sys.argv[i] == "--domain_file":
+                choiceMadeByUser[2] = sys.argv[i + 1]
             else:
                 print("Invalid argument")
                 print("argument = " + sys.argv[i+1] + " et i = " + str(i))
                 exit()
+
+    if choiceMadeByUser[0] == "" and choiceMadeByUser[2] == "":
+        print("No domain or domain file specified")
+        exit()
+
+    if choiceMadeByUser[1] == 0:
+        print("No level of scan specified")
+        exit()
+
+    if choiceMadeByUser[0] != "" and choiceMadeByUser[2] != "":
+        print("You can't specify a domain and a domain file at the same time")
+        exit()
 
     elif len(sys.argv) == 1:
         print("No arguments passed, please use --wizard or -w to run the wizard or use --help or -h to see the help menu")
@@ -43,12 +56,13 @@ def getArgs(choiceMadeByUser):
 
 def displayHelp():
 
-    print("usage : python main.py [-h] [-w] [-d domain] [-l level of scan]\n")
+    print("usage : python main.py [-h] [-w] [-d domain] [-l level of scan] [-df domain file]\n")
     print("optional arguments:")
     print("-h, --help            show this help message and exit")
     print("-w, --wizard          run the wizard")
     print("-d, --domain          domain to scan")
     print("-l, --level           level of scan (1, 2, or 3)")
+    print("-df, --domain_file    file containing domains to scan")
     exit(0)
 
 
@@ -61,6 +75,10 @@ def installation(choiceMadeByUser):
     time.sleep(1)
     os.system("pip install -r dnscan/requirements.txt")
     print("Installation complete!")
+
+    # create directory to store the results
+    if not os.path.exists("results"):
+        os.system("mkdir results")
 
     runController(choiceMadeByUser)
 
@@ -97,8 +115,11 @@ def runDNScan(choiceMadeByUser):
         levelOfScan = "subdomains-10000.txt"
 
     time.sleep(1)
-    os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[0] + " -t 10 -R 1.1.1.1 -o " + choiceMadeByUser[
-        0] + ".txt -w dnscan/" + levelOfScan)
+    if choiceMadeByUser[2] == "":
+        os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[0] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[0] + ".txt -w dnscan/" + levelOfScan)
+    else:
+        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[2] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[2] + ".txt -w dnscan/" + levelOfScan)
+
 
 
 if __name__ == '__main__':
