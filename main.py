@@ -52,7 +52,7 @@ def getArgs(choiceMadeByUser):
         print("No arguments passed, please use --wizard or -w to run the wizard or use --help or -h to see the help menu")
         sys.exit()
 
-    installation(choiceMadeByUser)
+    installationController(choiceMadeByUser)
 
 
 def displayHelp():
@@ -67,26 +67,44 @@ def displayHelp():
     exit(0)
 
 
-def installation(choiceMadeByUser):
+def installationDnscan():
     if not os.path.exists("dnscan"):
         os.system("git clone https://github.com/rbsec/dnscan.git")
 
     # install the dependencies
-    print("Dependency installation...")
+    print("Dependency installation DnScan...")
     time.sleep(1)
     os.system("pip install -r dnscan/requirements.txt")
-    print("Installation complete!")
+    print("Installation complete!\n")
 
-    # create directory to store the results
-    if not os.path.exists("results"):
-        os.system("mkdir results")
+def installtionHarvester():
+    if not os.path.exists("harvester"):
+        os.system("git clone https://github.com/laramies/theHarvester.git")
 
-    runController(choiceMadeByUser)
+    # install the dependencies
+    print("Dependency installation TheHarvester...")
+    time.sleep(1)
+    os.system("pip install -r harvester/requirements.txt")
+    print("Installation complete!\n")
+
 
 
 def runController(choiceMadeByUser):
     runDNScan(choiceMadeByUser)
 
+
+def installationController(choiceMadeByUser):
+    # install the dependencies
+    installationDnscan()
+    installtionHarvester()
+
+    # create directory installation to store the results
+    if not os.path.exists("results"):
+        os.system("mkdir results")
+        os.system("mkdir results/dnscan")
+        os.system("mkdir results/harvester")
+
+    runController(choiceMadeByUser)
 
 def userSelection(choiceMadeByUser):
     # ask the user for the domain to scan or the file containing the domains to scan
@@ -111,7 +129,7 @@ def userSelection(choiceMadeByUser):
         if choiceMadeByUser[1] == "1" or choiceMadeByUser[1] == "2" or choiceMadeByUser[1] == "3":
             break
 
-    installation(choiceMadeByUser)
+    installationController(choiceMadeByUser)
 
 
 def runDNScan(choiceMadeByUser):
