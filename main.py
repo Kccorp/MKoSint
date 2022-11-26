@@ -54,6 +54,7 @@ def getArgs(choiceMadeByUser):
 
     installation(choiceMadeByUser)
 
+
 def displayHelp():
 
     print("usage : python main.py [-h] [-w] [-d domain] [-l level of scan] [-df domain file]\n")
@@ -88,8 +89,18 @@ def runController(choiceMadeByUser):
 
 
 def userSelection(choiceMadeByUser):
-    print("What domain would you like to scan?")
-    choiceMadeByUser[0] = input("Domain: ")
+    # ask the user for the domain to scan or the file containing the domains to scan
+    while True:
+        print("Do you want to scan a single domain or a file containing domains ?")
+        print("1. Single domain")
+        print("2. File containing domains")
+        choice = input("Your choice : ")
+        if choice == "1":
+            choiceMadeByUser[0] = input("Enter the domain to scan : ")
+            break
+        elif choice == "2":
+            choiceMadeByUser[2] = input("Enter the file containing domains to scan : ")
+            break
 
     while True:
         print("what level of scan would you like to run?")
@@ -100,7 +111,7 @@ def userSelection(choiceMadeByUser):
         if choiceMadeByUser[1] == "1" or choiceMadeByUser[1] == "2" or choiceMadeByUser[1] == "3":
             break
 
-    runController(choiceMadeByUser)
+    installation(choiceMadeByUser)
 
 
 def runDNScan(choiceMadeByUser):
@@ -118,7 +129,7 @@ def runDNScan(choiceMadeByUser):
     if choiceMadeByUser[2] == "":
         os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[0] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[0] + ".txt -w dnscan/" + levelOfScan)
     else:
-        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[2] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[2] + ".txt -w dnscan/" + levelOfScan)
+        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[2] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[2] + " -w dnscan/" + levelOfScan)
 
 
 
