@@ -77,16 +77,16 @@ def installationDnscan():
     os.system("pip install -r dnscan/requirements.txt")
     print("Installation complete!\n")
 
-def installtionHarvester():
-    if not os.path.exists("harvester"):
-        os.system("git clone https://github.com/laramies/theHarvester.git")
+
+def installTheHarvester():
+    if not os.path.exists("theHarvester"):
+        os.system("git clone https://github.com/laramies/theHarvester ")
 
     # install the dependencies
     print("Dependency installation TheHarvester...")
     time.sleep(1)
-    os.system("pip install -r harvester/requirements.txt")
+    os.system("python3 -m pip install -r requirements/dev.txt")
     print("Installation complete!\n")
-
 
 
 def runController(choiceMadeByUser):
@@ -96,13 +96,13 @@ def runController(choiceMadeByUser):
 def installationController(choiceMadeByUser):
     # install the dependencies
     installationDnscan()
-    installtionHarvester()
+    installTheHarvester()
 
     # create directory installation to store the results
     if not os.path.exists("results"):
         os.system("mkdir results")
         os.system("mkdir results/dnscan")
-        os.system("mkdir results/harvester")
+        os.system("mkdir results/theHarvester")
 
     runController(choiceMadeByUser)
 
@@ -149,6 +149,22 @@ def runDNScan(choiceMadeByUser):
     else:
         os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[2] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[2] + " -w dnscan/" + levelOfScan)
 
+def runTheHarvester(choiceMadeByUser):
+    print("Running TheHarvester...")
+    time.sleep(1)
+
+    # make switch case for the different levels of scans
+    if choiceMadeByUser[1] == "1":
+        levelOfScan = "bing"
+    elif choiceMadeByUser[1] == "2":
+        levelOfScan = "bing,google"
+    elif choiceMadeByUser[1] == "3":
+        levelOfScan = "all"
+
+    if choiceMadeByUser[2] == "":
+        os.system("python theHarvester/theHarvester.py -d " + choiceMadeByUser[0] + " -b " + levelOfScan + " -f results/theHarvester/" + choiceMadeByUser[0] + ".txt")
+    else:
+        os.system("python theHarvester/theHarvester.py -l " + choiceMadeByUser[2] + " -b " + levelOfScan + " -f results/theHarvester/" + choiceMadeByUser[2] + ".txt")
 
 
 if __name__ == '__main__':
