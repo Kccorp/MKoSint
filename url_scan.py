@@ -21,25 +21,86 @@ def get_urlscan_result(uuid):
     response = requests.get(f'https://urlscan.io/api/v1/result/{uuid}')
 
     # Parse the response as JSON
-    result = json.loads(response.text)
+    data = json.loads(response.text)
 
-    # Print the result
-    print(result)
-    # Clean the result to make it more human-readable
-    cleaned_result = {}
-    cleaned_result['task'] = result.get('task', '')
-    cleaned_result['url'] = result.get('url', '')
-    cleaned_result['domain'] = result.get('domain', '')
-    cleaned_result['page'] = result.get('page', '')
-    cleaned_result['virustotal'] = result.get('virustotal', '')
+    print_summary(data)
 
-    # Print the cleaned result
-    print(cleaned_result)
-    return cleaned_result
+def print_summary(content):
+    ### relevant aggregate data
+    request_info = content.get("data").get("requests")
+    meta_info = content.get("meta")
+    verdict_info = content.get("verdicts")
+    list_info = content.get("lists")
+    stats_info = content.get("stats")
+    page_info = content.get("page")
+
+    ### more specific data
+    geoip_info = meta_info.get("processors").get("geoip")
+    web_apps_info = meta_info.get("processors").get("wappa")
+    resource_info = stats_info.get("resourceStats")
+    protocol_info = stats_info.get("protocolStats")
+    ip_info = stats_info.get("ipStats")
+
+    ### enumerate countries
+    countries = []
+    for item in resource_info:
+        country_list = item.get("countries")
+        for country in country_list:
+            if country not in countries:
+                countries.append(country)
+
+    ### enumerate web apps
+    web_apps = []
+    for app in web_apps_info.get("data"):
+        web_apps.append(app.get("app"))
+
+    ### enumerate domains pointing to ip
+    pointed_domains = []
+    for ip in ip_info:
+        domain_list = ip.get("domains")
+        for domain in domain_list:
+            if domain not in pointed_domains:
+                pointed_domains.append(domain)
+
+
+    ### data for summary
+    page_domain = page_info.get("domain")
+    page_ip = page_info.get("ip")
+    page_country = page_info.get("country")
+    page_server = page_info.get("server")
+    ads_blocked = stats_info.get("adBlocked")
+    https_percentage = stats_info.get("securePercentage")
+    ipv6_percentage = stats_info.get("IPv6Percentage")
+    country_count = stats_info.get("uniqCountries")
+    num_requests = len(request_info)
+    is_malicious = verdict_info.get("overall").get("malicious")
+    malicious_total = verdict_info.get("engines").get("maliciousTotal")
+    ip_addresses = list_info.get("ips")
+    urls = list_info.get("urls")
+
+
+    ### print data
+    if str(page_ip) != "None":
+        print("Domain: " + page_domain)
+        print("IP Address: " + str(page_ip))
+        print("Country: " + page_country)
+        print("Server: " + str(page_server))
+        print("Web Apps: " + str(web_apps))
+        print("Number of Requests: " + str(num_requests))
+        print("Ads Blocked: " + str(ads_blocked))
+        print("HTTPS Requests: " + str(https_percentage) + "%")
+        print("IPv6: " + str(ipv6_percentage) + "%")
+        print("Unique Country Count: " + str(country_count))
+        print("Malicious: " + str(is_malicious))
+        print("Malicious Requests: " + str(malicious_total))
+        print("Pointed Domains: " + str(pointed_domains))
+
+
+
 
 
 def main():
-    scan("https://google.com/path")
+    scan("https://lazyapeyachtclub.com")
 
 
 if __name__ == "__main__":
