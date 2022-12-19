@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 
 def scan(url):
@@ -14,7 +15,17 @@ def scan(url):
 def get_urlscan_result(uuid):
     # Use the urlscan.io API to get the result for the given UUID
     #wait for the scan to return a http 200
+    wait=0
     while True:
+        if(wait<5):
+
+            #clear the terminal
+            os.system('cls' if os.name == 'nt' else 'clear')
+            wait+=1
+            print("Waiting for scan to complete"+ "."*wait)
+        else:
+            wait=0
+
         response = requests.get('https://urlscan.io/api/v1/result/' + uuid)
         if response.status_code == 200:
             break
