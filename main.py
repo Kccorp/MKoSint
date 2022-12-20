@@ -77,7 +77,8 @@ def displayHelp():
     print("-w, --wizard          run the wizard")
     print("-d, --domain          domain to scan")
     print("-i, --ip              ip to scan")
-    print("-l, --level           level of scan (1 for a quick and summarize scan, 2 for a full scan (may take a while))")
+    print(
+        "-l, --level           level of scan (1 for a quick and summarize scan, 2 for a full scan (may take a while))")
     print("-df, --domain_file    file containing domains or ip to scan")
     exit(0)
 
@@ -95,7 +96,7 @@ def runController(choiceMadeByUser):
             choiceMadeByUser[0] = ip
             uwurlScan(choiceMadeByUser[0], choiceMadeByUser[1])
             shodan_ip_search(ip, choiceMadeByUser[1])
-    elif check_ip(choiceMadeByUser[0]) :
+    elif check_ip(choiceMadeByUser[0]):
         uwurlScan(choiceMadeByUser[0], choiceMadeByUser[1])
         shodan_ip_search(choiceMadeByUser[0], choiceMadeByUser[1])
 
