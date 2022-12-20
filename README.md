@@ -14,6 +14,8 @@ following dependencies installed:
 ```bash
 >=Python3.7
 >=pip22.3
+shodan
+requests
 ```
     
 ## Installation
