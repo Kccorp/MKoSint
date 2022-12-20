@@ -174,13 +174,13 @@ def get_urlscan_result(uuid, level):
 
     # Parse the response as JSON
     data = json.loads(response.text)
-    print("le putain de level est " + level)
+
     if level == 2 or level == "2":
-        print("ça va ecrire enculé")
+
         with open(data['page']['domain'] + ".json", "w") as outfile:
             json.dump(data, outfile, indent=4)
     elif level == 1 or level == "1":
-        print("ça va ecrire en petit enculé")
+
         clear_result_urlscan_api(data)
 
 
@@ -210,8 +210,9 @@ def clear_result_urlscan_api(content):
 
     ## enumerate web apps
     web_apps = []
-    for app in web_apps_info.get("data"):
-        web_apps.append(app.get("app"))
+    if web_apps_info is not None:
+        for app in web_apps_info.get("data"):
+            web_apps.append(app.get("app"))
 
     ### enumerate domains pointing to ip
     pointed_domains = []
@@ -237,7 +238,7 @@ def clear_result_urlscan_api(content):
     urls = list_info.get("urls")
 
     ### print data into a file named quick.domain.txt
-    with open(f"quick.{page_domain}.txt", "w") as f:
+    with open(f"results/easy/urlscan/{page_domain}.txt", "w") as f:
         f.write(f"Domain: {page_domain}\n")
         f.write(f"IP: {page_ip}\n")
         f.write(f"Country: {page_country}\n")
