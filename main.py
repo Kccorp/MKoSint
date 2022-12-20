@@ -149,6 +149,8 @@ def scan(url, level):
     headers = {'API-Key': '0d6990d9-45e0-4421-9f96-d349f659743a', 'Content-Type': 'application/json'}
     data = {"url": url, "visibility": "public"}
     response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data))
+    if response.status_code == 400:
+        return
     uuid = response.json()['uuid']
     get_urlscan_result(uuid, level)
 
