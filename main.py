@@ -26,7 +26,12 @@ def getArgs(choiceMadeByUser):
     if len(sys.argv) > 1:
         for i in range(1, len(sys.argv), 2):
             if sys.argv[i] == "--domain" or sys.argv[i] == "-d":
-                check_domain(sys.argv[i + 1])
+                if not check_domain(sys.argv[i + 1]):
+                    exit()
+                choiceMadeByUser[0] = sys.argv[i + 1]
+            elif sys.argv[i] == "--ip" or sys.argv[i] == "-i":
+                if not check_ip(sys.argv[i + 1]):
+                    exit()
                 choiceMadeByUser[0] = sys.argv[i + 1]
             elif sys.argv[i] == "--level" or sys.argv[i] == "-l":
                 if sys.argv[i + 1] == "1" or sys.argv[i + 1] == "2" or sys.argv[i + 1] == "3":
@@ -35,7 +40,9 @@ def getArgs(choiceMadeByUser):
                     print("Invalid level of scan (1, 2, or 3)")
                     exit()
             elif sys.argv[i] == "-df" or sys.argv[i] == "--domain_file":
-                choiceMadeByUser[2] = sys.argv[i + 1]
+                # check if the file exists
+                if os.path.isfile(sys.argv[i + 1]):
+                    choiceMadeByUser[2] = sys.argv[i + 1]
             else:
                 print("Invalid argument")
                 print("argument = " + sys.argv[i + 1] + " et i = " + str(i))
@@ -67,14 +74,24 @@ def displayHelp():
     print("-h, --help            show this help message and exit")
     print("-w, --wizard          run the wizard")
     print("-d, --domain          domain to scan")
-    print("-l, --level           level of scan (1, 2, or 3)")
-    print("-df, --domain_file    file containing domains to scan")
+    print("-i, --ip              ip to scan")
+    print(
+        "-l, --level           level of scan (1 for a quick and summarize scan, 2 for a full scan (may take a while))")
+    print("-df, --domain_file    file containing domains or ip to scan")
     exit(0)
 
 
 def runController(choiceMadeByUser):
+
+    if choiceMadeByUser[2] != "":
+        domains=parse_file(choiceMadeByUser[2])[1]
+        for domain in domains:
+            choiceMadeByUser[0] = domain
+            runDNScan(choiceMadeByUser)
+            scan(choiceMadeByUser[0], choiceMadeByUser[1])
+        exit(0)
     runDNScan(choiceMadeByUser)
-    #runTheHarvester(choiceMadeByUser)
+    runTheHarvester(choiceMadeByUser)
     scan(choiceMadeByUser[0], choiceMadeByUser[1])
     shodan_domain_search(choiceMadeByUser[0], choiceMadeByUser[1])
 
@@ -357,11 +374,11 @@ def shodan_ip_search(ip, level):
 
     info = api.host(ip)
     if level == "2":
-        with open(ip + ".json", "w") as outfile:
+        with open("results/full/shodan/" + ip + ".json", "w") as outfile:
             json.dump(info, outfile, indent=4)
     else:
         clean_data = clean_shodan_api_result_ip(info)
-        with open("resume" + ip + ".json", "w") as outfile:
+        with open("results/easy/shodan/" + ip + ".json", "w") as outfile:
             json.dump(clean_data, outfile, indent=4)
 
 
@@ -392,8 +409,10 @@ def parse_file(file):
     with open(file, "r") as f:
         for line in f:
             if check_ip(line):
+                line = line.replace("\n", "")
                 ip_list.append(line)
             elif check_domain(line):
+                line = line.replace("\n", "")
                 domain_list.append(line)
     return ip_list, domain_list
 
@@ -404,7 +423,7 @@ def check_domain(domain):
         return True
     else:
         print("Invalid domain")
-        exit()
+        return False
 
 
 def check_ip(ip):
@@ -413,8 +432,12 @@ def check_ip(ip):
         return True
     else:
         print("Invalid IP address")
-        exit()
+        return False
+
+
+
 
 
 if __name__ == '__main__':
     main()
+
