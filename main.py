@@ -149,7 +149,6 @@ def runDNScan(choiceMadeByUser):
         0] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
 
 
-
 def runTheHarvester(choiceMadeByUser):
     print("Running TheHarvester...")
     print("This may take a while...")
