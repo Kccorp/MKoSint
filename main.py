@@ -109,16 +109,25 @@ def runController(choiceMadeByUser):
 def userSelection(choiceMadeByUser):
     # ask the user for the domain to scan or the file containing the domains to scan
     while True:
-        print("Do you want to scan a single domain or a file containing domains ?")
+        print("Do you want to scan a single domain or a file containing ip or domains ?")
         print("1. Single domain")
-        print("2. File containing domains")
+        print("2. ip")
+        print("3. File containing domains and ip")
         choice = input("Your choice : ")
         if choice == "1":
             choiceMadeByUser[0] = input("Enter the domain to scan : ")
-            break
+            if check_domain(choiceMadeByUser[0]):
+                break
+
         elif choice == "2":
-            choiceMadeByUser[2] = input("Enter the file containing domains to scan : ")
-            break
+            choiceMadeByUser[0] = input("Enter the ip to scan : ")
+            if check_ip(choiceMadeByUser[0]):
+                break
+
+        elif choice == "3":
+            choiceMadeByUser[2] = input("Enter the file containing domains and/or ip to scan : ")
+            if os.path.isfile(choiceMadeByUser[2]):
+                break
 
     while True:
         print("what level of scan would you like to run?")
