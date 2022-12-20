@@ -17,8 +17,13 @@ def installationController():
             os.system("md results\\full")
             os.system("md results\\easy\\dnscan")
             os.system("md results\\easy\\theHarvester")
+            os.system("md results\\easy\\urlscan")
+            os.system("md results\\easy\\shodan")
             os.system("md results\\full\\dnscan")
             os.system("md results\\full\\theHarvester")
+            os.system("md results\\full\\urlscan")
+            os.system("md results\\full\\shodan")
+
 
     else:
         if not os.path.exists("results"):
@@ -29,6 +34,10 @@ def installationController():
             os.system("mkdir results/easy/theHarvester")
             os.system("mkdir results/full/dnscan")
             os.system("mkdir results/full/theHarvester")
+            os.system("mkdir results/easy/urlscan")
+            os.system("mkdir results/easy/shodan")
+            os.system("mkdir results/full/urlscan")
+            os.system("mkdir results/full/shodan")
 
 
 

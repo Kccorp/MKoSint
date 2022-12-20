@@ -1,30 +1,31 @@
-import requests
 import json
+import requests
 import os
+import sys
 
 
-def scan(url):
+def scan(url, level):
     print("Scanning " + url)
     headers = {'API-Key': '0d6990d9-45e0-4421-9f96-d349f659743a', 'Content-Type': 'application/json'}
     data = {"url": url, "visibility": "public"}
     response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data))
     uuid = response.json()['uuid']
-    get_urlscan_result(uuid)
+    get_urlscan_result(uuid, level)
 
 
-def get_urlscan_result(uuid):
+def get_urlscan_result(uuid, level):
     # Use the urlscan.io API to get the result for the given UUID
-    #wait for the scan to return a http 200
-    wait=0
+    # wait for the scan to return a http 200
+    wait = 0
     while True:
-        if(wait<5):
+        if (wait < 5):
 
-            #clear the terminal
+            # clear the terminal
             os.system('cls' if os.name == 'nt' else 'clear')
-            wait+=1
-            print("Waiting for scan to complete"+ "."*wait)
+            wait += 1
+            print("Waiting for scan to complete" + "." * wait)
         else:
-            wait=0
+            wait = 0
 
         response = requests.get('https://urlscan.io/api/v1/result/' + uuid)
         if response.status_code == 200:
@@ -34,9 +35,14 @@ def get_urlscan_result(uuid):
     # Parse the response as JSON
     data = json.loads(response.text)
 
-    print_summary(data)
+    if level == 2:
+        with open(data['page']['domain'] + ".json", "w") as outfile:
+            json.dump(data, outfile, indent=4)
+    elif level == 1:
+        clear_result_urlscan_api(data)
 
-def print_summary(content):
+
+def clear_result_urlscan_api(content):
     ### relevant aggregate data
     request_info = content.get("data").get("requests")
     meta_info = content.get("meta")
@@ -73,7 +79,6 @@ def print_summary(content):
             if domain not in pointed_domains:
                 pointed_domains.append(domain)
 
-
     ### data for summary
     page_domain = page_info.get("domain")
     page_ip = page_info.get("ip")
@@ -89,29 +94,29 @@ def print_summary(content):
     ip_addresses = list_info.get("ips")
     urls = list_info.get("urls")
 
-
-    ### print data
-    if str(page_ip) != "None":
-        print("Domain: " + page_domain)
-        print("IP Address: " + str(page_ip))
-        print("Country: " + page_country)
-        print("Server: " + str(page_server))
-        print("Web Apps: " + str(web_apps))
-        print("Number of Requests: " + str(num_requests))
-        print("Ads Blocked: " + str(ads_blocked))
-        print("HTTPS Requests: " + str(https_percentage) + "%")
-        print("IPv6: " + str(ipv6_percentage) + "%")
-        print("Unique Country Count: " + str(country_count))
-        print("Malicious: " + str(is_malicious))
-        print("Malicious Requests: " + str(malicious_total))
-        print("Pointed Domains: " + str(pointed_domains))
-
-
+    ### print data into a file named quick.domain.txt
+    with open(f"quick.{page_domain}.txt", "w") as f:
+        f.write(f"Domain: {page_domain}\n")
+        f.write(f"IP: {page_ip}\n")
+        f.write(f"Country: {page_country}\n")
+        f.write(f"Server: {page_server}\n")
+        f.write(f"Ads Blocked: {ads_blocked}\n")
+        f.write(f"HTTPS Percentage: {https_percentage}\n")
+        f.write(f"IPv6 Percentage: {ipv6_percentage}\n")
+        f.write(f"Country Count: {country_count}\n")
+        f.write(f"Number of Requests: {num_requests}\n")
+        f.write(f"Malicious: {is_malicious}\n")
+        f.write(f"Malicious Total: {malicious_total}\n")
+        f.write(f"IP Addresses: {ip_addresses}\n")
+        f.write(f"URLs: {urls}\n")
+        f.write(f"Countries: {countries}\n")
+        f.write(f"Web Apps: {web_apps}\n")
+        f.write(f"Domains Pointing to IP: {pointed_domains}\n")
 
 
 
 def main():
-    scan("https://lazyapeyachtclub.com")
+    scan("leslipfrancais.fr", 1)
 
 
 if __name__ == "__main__":

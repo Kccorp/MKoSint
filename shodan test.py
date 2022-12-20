@@ -124,6 +124,18 @@ def check_domain(domain):
         exit()
 
 
+#a function that parse a file and return a list of ip and a list of domain with check_domain or check_ip
+def parse_file(file):
+    ip_list = []
+    domain_list = []
+    with open(file, "r") as f:
+        for line in f:
+            if check_ip(line):
+                ip_list.append(line)
+            elif check_domain(line):
+                domain_list.append(line)
+    return ip_list, domain_list
+
 def main():
     input("Press Enter to continue...")
     choice = input("would you like to search by IP or by domain (type 1 for ip, type 2 for domain) ?")
