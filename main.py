@@ -73,8 +73,8 @@ def displayHelp():
 
 
 def runController(choiceMadeByUser):
-    #runDNScan(choiceMadeByUser)
-    #runTheHarvester(choiceMadeByUser)
+    runDNScan(choiceMadeByUser)
+    runTheHarvester(choiceMadeByUser)
     scan(choiceMadeByUser[0], choiceMadeByUser[1])
 
 def userSelection(choiceMadeByUser):
