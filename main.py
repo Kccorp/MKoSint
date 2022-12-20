@@ -27,17 +27,19 @@ def getArgs(choiceMadeByUser):
         for i in range(1, len(sys.argv), 2):
             if sys.argv[i] == "--domain" or sys.argv[i] == "-d":
                 if not check_domain(sys.argv[i + 1]):
+                    print("Invalid domain")
                     exit()
                 choiceMadeByUser[0] = sys.argv[i + 1]
             elif sys.argv[i] == "--ip" or sys.argv[i] == "-i":
                 if not check_ip(sys.argv[i + 1]):
+                    print("Invalid IP")
                     exit()
                 choiceMadeByUser[0] = sys.argv[i + 1]
             elif sys.argv[i] == "--level" or sys.argv[i] == "-l":
                 if sys.argv[i + 1] == "1" or sys.argv[i + 1] == "2" or sys.argv[i + 1] == "3":
                     choiceMadeByUser[1] = sys.argv[i + 1]
                 else:
-                    print("Invalid level of scan (1, 2, or 3)")
+                    print("Invalid level of Scan (1, 2, or 3)")
                     exit()
             elif sys.argv[i] == "-df" or sys.argv[i] == "--domain_file":
                 # check if the file exists
@@ -75,25 +77,33 @@ def displayHelp():
     print("-w, --wizard          run the wizard")
     print("-d, --domain          domain to scan")
     print("-i, --ip              ip to scan")
-    print(
-        "-l, --level           level of scan (1 for a quick and summarize scan, 2 for a full scan (may take a while))")
+    print("-l, --level           level of scan (1 for a quick and summarize scan, 2 for a full scan (may take a while))")
     print("-df, --domain_file    file containing domains or ip to scan")
     exit(0)
 
 
 def runController(choiceMadeByUser):
-
     if choiceMadeByUser[2] != "":
-        domains=parse_file(choiceMadeByUser[2])[1]
+        domains = parse_file(choiceMadeByUser[2])[1]
+        ips = parse_file(choiceMadeByUser[2])[0]
         for domain in domains:
             choiceMadeByUser[0] = domain
             runDNScan(choiceMadeByUser)
-            scan(choiceMadeByUser[0], choiceMadeByUser[1])
-        exit(0)
-    runDNScan(choiceMadeByUser)
-    runTheHarvester(choiceMadeByUser)
-    scan(choiceMadeByUser[0], choiceMadeByUser[1])
-    shodan_domain_search(choiceMadeByUser[0], choiceMadeByUser[1])
+            uwurlScan(choiceMadeByUser[0], choiceMadeByUser[1])
+            shodan_domain_search(choiceMadeByUser[0], choiceMadeByUser[1])
+        for ip in ips:
+            choiceMadeByUser[0] = ip
+            uwurlScan(choiceMadeByUser[0], choiceMadeByUser[1])
+            shodan_ip_search(ip, choiceMadeByUser[1])
+    elif check_ip(choiceMadeByUser[0]) :
+        uwurlScan(choiceMadeByUser[0], choiceMadeByUser[1])
+        shodan_ip_search(choiceMadeByUser[0], choiceMadeByUser[1])
+
+    else:
+        runDNScan(choiceMadeByUser)
+        runTheHarvester(choiceMadeByUser)
+        uwurlScan(choiceMadeByUser[0], choiceMadeByUser[1])
+        shodan_domain_search(choiceMadeByUser[0], choiceMadeByUser[1])
 
 
 def userSelection(choiceMadeByUser):
@@ -133,14 +143,11 @@ def runDNScan(choiceMadeByUser):
         output = "results/full/dnscan/"
 
     time.sleep(1)
-    if choiceMadeByUser[2] == "":
-        output += choiceMadeByUser[0] + ".txt"
-        os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[
-            0] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
-    else:
-        output += choiceMadeByUser[2] + ".txt"
-        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[
-            2] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
+
+    output += choiceMadeByUser[0] + ".txt"
+    os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[
+        0] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
+
 
 
 def runTheHarvester(choiceMadeByUser):
@@ -168,7 +175,7 @@ def runTheHarvester(choiceMadeByUser):
 
 ################################################################## URL SCAN ##################################################################
 
-def scan(url, level):
+def uwurlScan(url, level):
     api = api_check("UrlScan")
     print(repr(api))
     print("Scanning " + url)
@@ -184,7 +191,7 @@ def scan(url, level):
 
 def get_urlscan_result(uuid, level):
     # Use the urlscan.io API to get the result for the given UUID
-    # wait for the scan to return a http 200
+    # wait for the uwurlScan to return a http 200
     wait = 0
     while True:
         if (wait < 5):
@@ -192,7 +199,7 @@ def get_urlscan_result(uuid, level):
             # clear the terminal
             os.system('cls' if os.name == 'nt' else 'clear')
             wait += 1
-            print("Waiting for scan to complete" + "." * wait)
+            print("Waiting for uwurlScan to complete" + "." * wait)
         else:
             wait = 0
 
@@ -422,7 +429,6 @@ def check_domain(domain):
     if re.match(DOMAIN_REGEX, domain):
         return True
     else:
-        print("Invalid domain")
         return False
 
 
@@ -431,13 +437,9 @@ def check_ip(ip):
     if re.match(IPV4_REGEX, ip):
         return True
     else:
-        print("Invalid IP address")
         return False
-
-
-
 
 
 if __name__ == '__main__':
     main()
-
+    # print(parse_file("domains.txt"))
