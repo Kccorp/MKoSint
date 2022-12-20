@@ -52,7 +52,7 @@ def getArgs(choiceMadeByUser):
         print("No arguments passed, please use --wizard or -w to run the wizard or use --help or -h to see the help menu")
         sys.exit()
 
-    installation(choiceMadeByUser)
+    runController(choiceMadeByUser)
 
 
 def displayHelp():
@@ -67,26 +67,9 @@ def displayHelp():
     exit(0)
 
 
-def installation(choiceMadeByUser):
-    if not os.path.exists("dnscan"):
-        os.system("git clone https://github.com/rbsec/dnscan.git")
-
-    # install the dependencies
-    print("Dependency installation...")
-    time.sleep(1)
-    os.system("pip install -r dnscan/requirements.txt")
-    print("Installation complete!")
-
-    # create directory to store the results
-    if not os.path.exists("results"):
-        os.system("mkdir results")
-
-    runController(choiceMadeByUser)
-
-
 def runController(choiceMadeByUser):
-    runDNScan(choiceMadeByUser)
-
+    # runDNScan(choiceMadeByUser)
+    runTheHarvester(choiceMadeByUser)
 
 def userSelection(choiceMadeByUser):
     # ask the user for the domain to scan or the file containing the domains to scan
@@ -104,14 +87,13 @@ def userSelection(choiceMadeByUser):
 
     while True:
         print("what level of scan would you like to run?")
-        print("1. Quick")
-        print("2. Basic")
-        print("3. Full")
+        print("1. Easy")
+        print("2. Full")
         choiceMadeByUser[1] = input("Choice: ")
-        if choiceMadeByUser[1] == "1" or choiceMadeByUser[1] == "2" or choiceMadeByUser[1] == "3":
+        if choiceMadeByUser[1] == "1" or choiceMadeByUser[1] == "2" :
             break
 
-    installation(choiceMadeByUser)
+    runController(choiceMadeByUser)
 
 
 def runDNScan(choiceMadeByUser):
@@ -120,17 +102,38 @@ def runDNScan(choiceMadeByUser):
     # make switch case for the different levels of scans
     if choiceMadeByUser[1] == "1":
         levelOfScan = "subdomains-500.txt"
+        output = "results/easy/dnscan/"
     elif choiceMadeByUser[1] == "2":
-        levelOfScan = "subdomains-1000.txt"
-    elif choiceMadeByUser[1] == "3":
         levelOfScan = "subdomains-10000.txt"
+        output = "results/full/dnscan/"
 
     time.sleep(1)
     if choiceMadeByUser[2] == "":
-        os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[0] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[0] + ".txt -w dnscan/" + levelOfScan)
+        output += choiceMadeByUser[0] + ".txt"
+        os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[0] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
     else:
-        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[2] + " -t 10 -R 1.1.1.1 -o results/" + choiceMadeByUser[2] + " -w dnscan/" + levelOfScan)
+        output += choiceMadeByUser[2] + ".txt"
+        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[2] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
 
+def runTheHarvester(choiceMadeByUser):
+    print("Running TheHarvester...")
+    print("This may take a while...")
+    # make switch case for the different levels of scans
+    if choiceMadeByUser[1] == "1":
+        levelOfScan = "bing"
+        output = "../results/easy/theHarvester/"
+    elif choiceMadeByUser[1] == "2":
+        levelOfScan = "all"
+        output = "../results/full/theHarvester/"
+
+    time.sleep(1)
+    if choiceMadeByUser[2] == "":
+        output += choiceMadeByUser[0] + ".txt"
+
+        os.system("cd theHarvester && python theHarvester.py -d " + choiceMadeByUser[0] + " -l 500 -b " + levelOfScan + " -f " + output)
+    else:
+        output += choiceMadeByUser[2] + ".txt" #A modifier pour que le nom du fichier soit le nom du domaine
+        os.system("python theharvester/theHarvester.py -d " + choiceMadeByUser[2] + " -l 500 -b " + levelOfScan + " -f " + output)
 
 
 
