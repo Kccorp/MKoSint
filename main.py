@@ -177,7 +177,7 @@ def get_urlscan_result(uuid, level):
 
     if level == 2 or level == "2":
 
-        with open(data['page']['domain'] + ".json", "w") as outfile:
+        with open("results/full/urlscan/"+data['page']['domain'] + ".json", "w") as outfile:
             json.dump(data, outfile, indent=4)
     elif level == 1 or level == "1":
 
