@@ -7,7 +7,6 @@ import json
 import requests
 
 
-
 def main():
     choiceMadeByUser = ["", 0, ""]
     getArgs(choiceMadeByUser)
@@ -27,10 +26,11 @@ def getArgs(choiceMadeByUser):
     if len(sys.argv) > 1:
         for i in range(1, len(sys.argv), 2):
             if sys.argv[i] == "--domain" or sys.argv[i] == "-d":
-                choiceMadeByUser[0] = sys.argv[i+1]
+                check_domain(sys.argv[i + 1])
+                choiceMadeByUser[0] = sys.argv[i + 1]
             elif sys.argv[i] == "--level" or sys.argv[i] == "-l":
-                if sys.argv[i+1] == "1" or sys.argv[i+1] == "2" or sys.argv[i+1] == "3":
-                    choiceMadeByUser[1] = sys.argv[i+1]
+                if sys.argv[i + 1] == "1" or sys.argv[i + 1] == "2" or sys.argv[i + 1] == "3":
+                    choiceMadeByUser[1] = sys.argv[i + 1]
                 else:
                     print("Invalid level of scan (1, 2, or 3)")
                     exit()
@@ -38,7 +38,7 @@ def getArgs(choiceMadeByUser):
                 choiceMadeByUser[2] = sys.argv[i + 1]
             else:
                 print("Invalid argument")
-                print("argument = " + sys.argv[i+1] + " et i = " + str(i))
+                print("argument = " + sys.argv[i + 1] + " et i = " + str(i))
                 exit()
 
     if choiceMadeByUser[0] == "" and choiceMadeByUser[2] == "":
@@ -54,14 +54,14 @@ def getArgs(choiceMadeByUser):
         exit()
 
     elif len(sys.argv) == 1:
-        print("No arguments passed, please use --wizard or -w to run the wizard or use --help or -h to see the help menu")
+        print(
+            "No arguments passed, please use --wizard or -w to run the wizard or use --help or -h to see the help menu")
         sys.exit()
 
     runController(choiceMadeByUser)
 
 
 def displayHelp():
-
     print("usage : python main.py [-h] [-w] [-d domain] [-l level of scan] [-df domain file]\n")
     print("optional arguments:")
     print("-h, --help            show this help message and exit")
@@ -74,9 +74,10 @@ def displayHelp():
 
 def runController(choiceMadeByUser):
     runDNScan(choiceMadeByUser)
-    # runTheHarvester(choiceMadeByUser)
+    #runTheHarvester(choiceMadeByUser)
     scan(choiceMadeByUser[0], choiceMadeByUser[1])
     shodan_domain_search(choiceMadeByUser[0], choiceMadeByUser[1])
+
 
 def userSelection(choiceMadeByUser):
     # ask the user for the domain to scan or the file containing the domains to scan
@@ -97,7 +98,7 @@ def userSelection(choiceMadeByUser):
         print("1. Easy")
         print("2. Full")
         choiceMadeByUser[1] = input("Choice: ")
-        if choiceMadeByUser[1] == "1" or choiceMadeByUser[1] == "2" :
+        if choiceMadeByUser[1] == "1" or choiceMadeByUser[1] == "2":
             break
 
     runController(choiceMadeByUser)
@@ -117,10 +118,13 @@ def runDNScan(choiceMadeByUser):
     time.sleep(1)
     if choiceMadeByUser[2] == "":
         output += choiceMadeByUser[0] + ".txt"
-        os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[0] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
+        os.system("python dnscan/dnscan.py -d " + choiceMadeByUser[
+            0] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
     else:
         output += choiceMadeByUser[2] + ".txt"
-        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[2] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
+        os.system("python dnscan/dnscan.py -l " + choiceMadeByUser[
+            2] + " -t 10 -R 1.1.1.1 -o " + output + " -w dnscan/" + levelOfScan)
+
 
 def runTheHarvester(choiceMadeByUser):
     print("Running TheHarvester...")
@@ -137,23 +141,29 @@ def runTheHarvester(choiceMadeByUser):
     if choiceMadeByUser[2] == "":
         output += choiceMadeByUser[0] + ".txt"
 
-        os.system("cd theHarvester && python theHarvester.py -d " + choiceMadeByUser[0] + " -l 500 -b " + levelOfScan + " -f " + output)
+        os.system("cd theHarvester && python theHarvester.py -d " + choiceMadeByUser[
+            0] + " -l 500 -b " + levelOfScan + " -f " + output)
     else:
-        output += choiceMadeByUser[2] + ".txt" #A modifier pour que le nom du fichier soit le nom du domaine
-        os.system("python theharvester/theHarvester.py -d " + choiceMadeByUser[2] + " -l 500 -b " + levelOfScan + " -f " + output)
+        output += choiceMadeByUser[2] + ".txt"  # A modifier pour que le nom du fichier soit le nom du domaine
+        os.system("python theharvester/theHarvester.py -d " + choiceMadeByUser[
+            2] + " -l 500 -b " + levelOfScan + " -f " + output)
 
 
 ################################################################## URL SCAN ##################################################################
 
 def scan(url, level):
+    api = api_check("UrlScan")
+    print(repr(api))
     print("Scanning " + url)
     headers = {'API-Key': '0d6990d9-45e0-4421-9f96-d349f659743a', 'Content-Type': 'application/json'}
     data = {"url": url, "visibility": "public"}
     response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=json.dumps(data))
+    print(response)
     if response.status_code == 400:
         return
     uuid = response.json()['uuid']
     get_urlscan_result(uuid, level)
+
 
 def get_urlscan_result(uuid, level):
     # Use the urlscan.io API to get the result for the given UUID
@@ -179,7 +189,7 @@ def get_urlscan_result(uuid, level):
 
     if level == 2 or level == "2":
 
-        with open("results/full/urlscan/"+data['page']['domain'] + ".json", "w") as outfile:
+        with open("results/full/urlscan/" + data['page']['domain'] + ".json", "w") as outfile:
             json.dump(data, outfile, indent=4)
     elif level == 1 or level == "1":
 
@@ -258,6 +268,7 @@ def clear_result_urlscan_api(content):
         f.write(f"Web Apps: {web_apps}\n")
         f.write(f"Domains Pointing to IP: {pointed_domains}\n")
 
+
 ################################################################## SHODAN ##################################################################
 
 
@@ -316,44 +327,34 @@ def clean_shodan_api_result_domain(domain):
         'country': 'Top 3 Countries',
     }
 
-    api = api_check()
+    api_key = api_check("Shodan")
+    api = shodan.Shodan(api_key)
     info = api.count(domain, facets=FACETS)
 
-    with open("results/easy/shodan/"+domain + ".json", "w") as outfile:
+    with open("results/easy/shodan/" + domain + ".json", "w") as outfile:
         json.dump(info, outfile, indent=4)
 
-
-def api_check():
-    api_key = "API_KEY"
-    with open("conf.txt", "r") as f:
-        for line in f:
-            if "Shodan_api_key" in line:
-                api_key = line.split(":")[1]
-                break
-
-    if api_key == "API_KEY":
-        print("No API key found in conf.txt, please respect the format Shodan_api_key:API_KEY")
-        exit()
-    api = shodan.Shodan(api_key)
-    return api
+    return "success"
 
 
 def shodan_domain_search(domain, level):
-    api = api_check()
-    print("the result will be saved in a json file named " + domain + ".json or resume" + domain + ".json if you choose a quick search")
+    api_key = api_check("Shodan")
+    api = shodan.Shodan(api_key)
+
     if level == "2":
         info = api.search(domain)
-        with open("results/full/shodan/"+domain + ".json", "w") as outfile:
+        with open("results/full/shodan/" + domain + ".json", "w") as outfile:
             json.dump(info, outfile, indent=4)
 
     else:
 
-        clean_data = clean_shodan_api_result_domain(domain)
+        clean_shodan_api_result_domain(domain)
 
 
 def shodan_ip_search(ip, level):
-    api = api_check()
-    print("the result will be saved in a json file named " + ip + ".json or resume" + ip + ".json if you choose a quick search")
+    api_key = api_check("Shodan")
+    api = shodan.Shodan(api_key)
+
     info = api.host(ip)
     if level == "2":
         with open(ip + ".json", "w") as outfile:
@@ -364,25 +365,27 @@ def shodan_ip_search(ip, level):
             json.dump(clean_data, outfile, indent=4)
 
 
-def check_ip(ip):
-    IPV4_REGEX = r"^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-    if re.match(IPV4_REGEX, ip):
-        return True
-    else:
-        print("Invalid IP address")
+################################################################## Misc ##################################################################
+
+def api_check(appname):
+    api_key = "API_KEY"
+    # check if conf.txt doesn't exist
+    if not os.path.exists("conf.txt"):
+        print("conf.txt doesn't exist")
+        api_key = input("Enter your " + appname + " API key")
+    with open("conf.txt", "r") as f:
+        for line in f:
+            if appname + "_api_key" in line:
+                api_key = line.split(":")[1]
+                api_key = api_key.replace("\n", "")
+                break
+
+    if api_key == "API_KEY":
+        print("No API key found in conf.txt, please respect the format AppName_api_key:API_KEY")
         exit()
+    return api_key
 
 
-def check_domain(domain):
-    DOMAIN_REGEX = r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$"
-    if re.match(DOMAIN_REGEX, domain):
-        return True
-    else:
-        print("Invalid domain")
-        exit()
-
-
-#a function that parse a file and return a list of ip and a list of domain with check_domain or check_ip
 def parse_file(file):
     ip_list = []
     domain_list = []
@@ -395,10 +398,23 @@ def parse_file(file):
     return ip_list, domain_list
 
 
+def check_domain(domain):
+    DOMAIN_REGEX = r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$"
+    if re.match(DOMAIN_REGEX, domain):
+        return True
+    else:
+        print("Invalid domain")
+        exit()
 
 
+def check_ip(ip):
+    IPV4_REGEX = r"^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+    if re.match(IPV4_REGEX, ip):
+        return True
+    else:
+        print("Invalid IP address")
+        exit()
 
-################################################################## MAIN ##################################################################
 
 if __name__ == '__main__':
     main()
