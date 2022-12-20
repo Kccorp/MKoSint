@@ -159,4 +159,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    shodan_domain_search("twitter.com", "1")
