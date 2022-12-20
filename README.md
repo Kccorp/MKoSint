@@ -34,6 +34,7 @@ sudo python3 install.py
 To install MKoSint using Docker, simply run the following command:
 
 ```bash
+mkdir -p results/{easy/{theHarvester,dnscan,urlscan,shodan},full/{theHarvester,dnscan,urlscan,shodan}}
 docker pull kccorp/mkosint
 ```
 
