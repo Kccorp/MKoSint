@@ -38,7 +38,7 @@ To install MKoSint using Docker, simply run the following command:
 ```bash
 mkdir -p results/{easy/{theHarvester,dnscan,urlscan,shodan},full/{theHarvester,dnscan,urlscan,shodan}}
 docker pull kcbod/mkosint:1.0
-sudo docker run --rm -v <absolut_path_to_results>:/app/results -it kcbod/mkosint:1.0 [Commande] [example : -d youtube.com -l 1]
+sudo docker run --rm -v <absolut_path_to_results>:/app/MKoSint/results -it kcbod/mkosint:1.0 [Commande] [example : -d youtube.com -l 1]
 ```
 
 ## Usage
